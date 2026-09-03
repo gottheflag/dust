@@ -123,12 +123,13 @@ a {
 	width: 28px;
 	height: 28px;
 	border-radius: 8px;
-	background: linear-gradient(135deg, var(--accent), var(--accent-2));
+	background: color-mix(in srgb, var(--accent) 25%, transparent);
+	border: 1px solid var(--ui-border);
 	display: grid;
 	place-items: center;
 	font-weight: 700;
 	font-size: 0.85rem;
-	color: var(--accent-contrast);
+	color: var(--ui-fg);
 	flex-shrink: 0;
 }
 
