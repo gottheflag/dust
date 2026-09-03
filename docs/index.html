@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="color-scheme" content="dark light">
+	<title>@gottheflag/dust</title>
+	<meta name="description"
+		content="Lightweight, canvas-based particle effects engine for TypeScript. Documentation and API reference.">
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<a class="skip-link" href="#content">Skip to content</a>
+
+	<button class="menu-toggle" type="button" aria-label="Toggle navigation">☰ Menu</button>
+
+	<div class="layout">
+		<nav class="sidebar" aria-label="Documentation navigation">
+			<div class="brand">
+				<div class="brand-mark">D</div>
+				<div class="brand-name">dust</div>
+			</div>
+			<div class="brand-sub">@gottheflag/dust · 0.1.0-beta.1</div>
+
+			<label class="search">
+				⌕
+				<input type="text" placeholder="Search docs" aria-label="Search documentation">
+				<kbd>/</kbd>
+			</label>
+
+			<div class="nav-group">
+				<div class="nav-group-title">Start</div>
+				<ul>
+					<li><a href="#overview">Overview</a></li>
+					<li><a href="#installation">Installation</a></li>
+					<li><a href="#quick-start">Quick start</a></li>
+				</ul>
+			</div>
+
+			<div class="nav-group">
+				<div class="nav-group-title">Core</div>
+				<ul>
+					<li><a href="#dust">Dust</a></li>
+					<li><a href="#launch">launch()</a></li>
+					<li><a href="#events">Events</a></li>
+					<li><a href="#renderer">Renderer</a></li>
+					<li><a href="#particle">Particle</a></li>
+				</ul>
+			</div>
+
+			<div class="nav-group">
+				<div class="nav-group-title">Physics &amp; layout</div>
+				<ul>
+					<li><a href="#physics">Speed, gravity, spread</a></li>
+					<li><a href="#root-origin">Root &amp; origin</a></li>
+					<li><a href="#fps">fps</a></li>
+				</ul>
+			</div>
+
+			<div class="nav-group">
+				<div class="nav-group-title">Effects</div>
+				<ul>
+					<li><a href="#effects">Overview</a></li>
+					<li><a href="#confetti">Confetti</a></li>
+					<li><a href="#snow">Snow</a></li>
+					<li><a href="#heart">Heart</a></li>
+					<li><a href="#text">Text &amp; Emoji</a></li>
+					<li><a href="#image">Image</a></li>
+				</ul>
+			</div>
+
+			<div class="nav-group">
+				<div class="nav-group-title">Guides</div>
+				<ul>
+					<li><a href="#custom-renderers">Building a custom renderer</a></li>
+					<li><a href="#pooling">Particle data &amp; pooling</a></li>
+				</ul>
+			</div>
+
+			<div class="nav-group">
+				<div class="nav-group-title">Reference</div>
+				<ul>
+					<li><a href="#types">Exported types</a></li>
+				</ul>
+			</div>
+		</nav>
+
+		<main id="content">
+			<section class="hero" id="overview">
+				<div class="kicker">Introduction</div>
+				<h1>Dust</h1>
+				<p class="tagline">A lightweight, canvas-based particle effects engine. Dust owns the simulation — you
+					own the pixels.</p>
+
+				<div class="meta-row">
+					<div class="meta-item">
+						<span class="label">Package</span>
+						<span class="value">@gottheflag/dust</span>
+					</div>
+					<div class="meta-item">
+						<span class="label">Version</span>
+						<span class="value">0.1.0-beta.1</span>
+					</div>
+					<div class="meta-item">
+						<span class="label">Modules</span>
+						<span class="value">ESM + CJS</span>
+					</div>
+					<div class="meta-item">
+						<span class="label">License</span>
+						<span class="value">Apache-2.0</span>
+					</div>
+				</div>
+
+				<p>Most particle libraries bundle simulation and visuals into one opinionated shape. Dust splits them: a
+					small physics engine handles position, velocity, gravity, lifetime, and pooling — a
+					<code>Renderer</code> you supply (or pick from the built-ins) decides what a particle actually looks
+					like. Confetti, snow, heart, text, emoji, and images all ship as ordinary renderers, built on the
+					exact same interface you'd use for your own.</p>
+
+				<div class="cards">
+					<div class="card">
+						<span class="num">01</span>
+						<h4>Physics / visuals split</h4>
+						<p>Dust never touches color, shape, rotation, or opacity. That's entirely the renderer's job.
+						</p>
+					</div>
+					<div class="card">
+						<span class="num">02</span>
+						<h4>Frame-rate independent</h4>
+						<p>Speed and gravity are defined against a fixed reference rate, not the display's actual
+							refresh rate.</p>
+					</div>
+					<div class="card">
+						<span class="num">03</span>
+						<h4>Scoped to any element</h4>
+						<p>Run against the whole window, or hand Dust a <code>root</code> and it sizes and tracks that
+							element instead.</p>
+					</div>
+					<div class="card">
+						<span class="num">04</span>
+						<h4>Pooled particles</h4>
+						<p>Dead particles are recycled, not reallocated — bursts stay cheap even under heavy reuse.</p>
+					</div>
+					<div class="card">
+						<span class="num">05</span>
+						<h4>Optional fps cap</h4>
+						<p>Throttle simulation/render frequency for cost, without changing how fast anything actually
+							moves.</p>
+					</div>
+					<div class="card">
+						<span class="num">06</span>
+						<h4>Five built-ins, one pattern</h4>
+						<p>Confetti, snow, heart, text/emoji, and image renderers — all worked examples for your own.
+						</p>
+					</div>
+				</div>
+			</section>
+
+			<section id="installation">
+				<div class="kicker">Start</div>
+				<h2>Installation</h2>
+				<p>Dust has one runtime dependency (<code>@gottheflag/lifecycle</code>), targets ES2022, and ships both
+					ESM and CJS builds with full type declarations.</p>
+
+				<div class="install-tabs">
+					<div class="install-tab-list">
+						<button class="active" type="button">npm</button>
+						<button type="button">pnpm</button>
+						<button type="button">yarn</button>
+						<button type="button">bun</button>
+					</div>
+					<div class="install-tab-body">
+						<pre style="display:block"><code>npm install @gottheflag/dust</code></pre>
+						<pre style="display:none"><code>pnpm add @gottheflag/dust</code></pre>
+						<pre style="display:none"><code>yarn add @gottheflag/dust</code></pre>
+						<pre style="display:none"><code>bun add @gottheflag/dust</code></pre>
+					</div>
+				</div>
+			</section>
+
+			<section id="quick-start">
+				<div class="kicker">Start</div>
+				<h2>Quick start</h2>
+				<p>Core engine and effects are separate subpaths — keeps the core import lean if you only need the
+					physics and want to write your own renderer.</p>
+
+				<pre><code><span class="tok-kw">import</span> { Dust } <span class="tok-kw">from</span> <span class="tok-str">"@gottheflag/dust"</span>;
+<span class="tok-kw">import</span> { ConfettiRenderer } <span class="tok-kw">from</span> <span class="tok-str">"@gottheflag/dust/effects"</span>;
+
+<span class="tok-kw">const</span> dust = <span class="tok-kw">new</span> <span class="tok-fn">Dust</span>({
+  renderer: <span class="tok-kw">new</span> <span class="tok-fn">ConfettiRenderer</span>(),
+});
+
+document.<span class="tok-fn">addEventListener</span>(<span class="tok-str">"click"</span>, (e) =&gt; {
+  dust.<span class="tok-fn">launch</span>({
+    origin: { x: e.clientX, y: e.clientY },
+    count: <span class="tok-num">40</span>,
+  });
+});</code></pre>
+
+				<p>That's the whole setup — <code>Dust</code> fills the window with a canvas and starts animating on the
+					first <code>launch()</code>. No manual render loop, no manual resize handling.</p>
+			</section>
+
+			<section id="dust">
+				<div class="kicker">Core</div>
+				<h2>Dust</h2>
+				<p class="lede">One instance per canvas. Owns the simulation loop, the particle pool, and a
+					<code>Renderer</code>. Create it once, call <code>launch()</code> as many times as you like.</p>
+
+				<pre><code><span class="tok-kw">new</span> <span class="tok-fn">Dust</span>(options: {
+  root?: HTMLElement;   <span class="tok-com">// defaults to the window</span>
+  renderer: Renderer;
+  fps?: number;          <span class="tok-com">// caps update/render frequency</span>
+})</code></pre>
+
+				<table>
+					<thead>
+						<tr>
+							<th>Option</th>
+							<th>Default</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>root</code></td>
+							<td>window</td>
+							<td>Element the canvas is scoped to. See <a href="#root-origin">Root &amp; origin</a>.</td>
+						</tr>
+						<tr>
+							<td><code>renderer</code></td>
+							<td><em>required</em></td>
+							<td>Controls how particles are drawn. See <a href="#renderer">Renderer</a>.</td>
+						</tr>
+						<tr>
+							<td><code>fps</code></td>
+							<td>uncapped</td>
+							<td>Caps how often the loop actually does work. See <a href="#fps">fps</a>.</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<h3>Methods</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>Method</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>launch(options?)</code></td>
+							<td>Spawns a burst of particles and starts (or continues) the simulation.</td>
+						</tr>
+						<tr>
+							<td><code>on(event, listener)</code></td>
+							<td>Subscribe to <code>"start"</code>, <code>"update"</code>, or <code>"end"</code>. Returns
+								an unsubscribe function.</td>
+						</tr>
+						<tr>
+							<td><code>destroy()</code></td>
+							<td>Stops the loop, clears particles and the pool, tears down the renderer and the canvas.
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<div class="callout">
+					<span class="callout-title">Multiple launches</span>
+					<p>Calling <code>launch()</code> while Dust is already running is safe and expected — new particles
+						join the existing simulation rather than starting a second loop. <code>"start"</code> only fires
+						on a genuine idle → active transition, and <code>"end"</code> only fires once every particle
+						from every overlapping <code>launch()</code> call has died.</p>
+				</div>
+			</section>
+
+			<section id="launch">
+				<div class="kicker">Core</div>
+				<h2>launch(options)</h2>
+				<p class="lede">Spawns <code>count</code> particles at <code>origin</code>, moving outward according to
+					<code>angle</code>, <code>spread</code>, and <code>speed</code>, pulled by <code>gravity</code>,
+					alive for <code>duration</code> milliseconds.</p>
+
+				<table>
+					<thead>
+						<tr>
+							<th>Option</th>
+							<th>Default</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>count</code></td>
+							<td><code>30</code></td>
+							<td>Particles to spawn.</td>
+						</tr>
+						<tr>
+							<td><code>origin</code></td>
+							<td>canvas center</td>
+							<td>Spawn point, <code>{ x, y }</code>.</td>
+						</tr>
+						<tr>
+							<td><code>speed</code></td>
+							<td><code>4</code></td>
+							<td>Base speed, in px/frame at a 60fps reference rate.</td>
+						</tr>
+						<tr>
+							<td><code>angle</code></td>
+							<td><code>0</code></td>
+							<td>Direction in degrees. <code>0</code> = right, <code>90</code> = down, <code>180</code> =
+								left, <code>270</code> = up.</td>
+						</tr>
+						<tr>
+							<td><code>spread</code></td>
+							<td><code>360</code></td>
+							<td>Width of the angular cone particles are spread across, centered on <code>angle</code>.
+							</td>
+						</tr>
+						<tr>
+							<td><code>gravity</code></td>
+							<td><code>0.1</code></td>
+							<td>Downward pull applied each frame.</td>
+						</tr>
+						<tr>
+							<td><code>duration</code></td>
+							<td><code>1000</code></td>
+							<td>Lifetime in milliseconds.</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<pre><code>dust.<span class="tok-fn">launch</span>({
+  origin: { x: <span class="tok-num">200</span>, y: <span class="tok-num">400</span> },
+  angle: <span class="tok-num">270</span>,       <span class="tok-com">// straight up</span>
+  spread: <span class="tok-num">40</span>,        <span class="tok-com">// narrow cone</span>
+  speed: <span class="tok-num">6</span>,
+  gravity: <span class="tok-num">0.15</span>,
+  count: <span class="tok-num">60</span>,
+  duration: <span class="tok-num">1500</span>,
+});</code></pre>
+			</section>
+
+			<section id="events">
+				<div class="kicker">Core</div>
+				<h2>Events</h2>
+				<pre><code>dust.<span class="tok-fn">on</span>(<span class="tok-str">"start"</span>, () =&gt; { <span class="tok-com">/* first launch from idle */</span> });
+dust.<span class="tok-fn">on</span>(<span class="tok-str">"update"</span>, (dt) =&gt; { <span class="tok-com">/* every simulated frame, dt in seconds */</span> });
+dust.<span class="tok-fn">on</span>(<span class="tok-str">"end"</span>, () =&gt; { <span class="tok-com">/* back to idle — every particle has died */</span> });</code></pre>
+			</section>
+
+			<section id="renderer">
+				<div class="kicker">Core</div>
+				<h2>Renderer</h2>
+				<p class="lede">The interface every visual effect implements — built-in or your own.</p>
+
+				<pre><code><span class="tok-kw">interface</span> Renderer&lt;T = unknown&gt; {
+  <span class="tok-fn">init</span>?(particle: Particle&lt;T&gt;): <span class="tok-kw">void</span>;
+  <span class="tok-fn">render</span>(
+    ctx: CanvasRenderingContext2D,
+    particle: Particle&lt;T&gt;,
+    dt: <span class="tok-kw">number</span>,
+  ): <span class="tok-kw">void</span>;
+  <span class="tok-fn">destroy</span>?(): <span class="tok-kw">void</span>;
+}</code></pre>
+
+				<table>
+					<thead>
+						<tr>
+							<th>Member</th>
+							<th>Called</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>init</code></td>
+							<td>once, on (re)spawn</td>
+							<td>Set up <code>particle.data</code> — color, size, rotation, anything the effect needs.
+							</td>
+						</tr>
+						<tr>
+							<td><code>render</code></td>
+							<td>every frame, per particle</td>
+							<td>Draw based on <code>particle.x/y</code> and <code>particle.data</code>.</td>
+						</tr>
+						<tr>
+							<td><code>destroy</code></td>
+							<td>once, on <code>dust.destroy()</code></td>
+							<td>Clean up anything allocated outside particle data.</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<div class="callout warn">
+					<span class="callout-title">Ownership boundary</span>
+					<p>Dust owns physics. Renderers own everything visual. Never write to <code>particle.x</code>,
+						<code>y</code>, <code>vx</code>, <code>vy</code>, <code>gravity</code>, or <code>life</code>
+						from a renderer — Dust manages those every frame.</p>
+				</div>
+			</section>
+
+			<section id="particle">
+				<div class="kicker">Core</div>
+				<h2>Particle</h2>
+				<p class="lede">The simulation's own shape. <code>data</code> is fully yours, typed by your renderer's
+					generic parameter.</p>
+
+				<pre><code><span class="tok-kw">interface</span> Particle&lt;T = unknown&gt; {
+  x: <span class="tok-kw">number</span>; y: <span class="tok-kw">number</span>;
+  vx: <span class="tok-kw">number</span>; vy: <span class="tok-kw">number</span>;
+  gravity: <span class="tok-kw">number</span>;
+  life: <span class="tok-kw">number</span>;   <span class="tok-com">// ms remaining</span>
+  data: T;
+}</code></pre>
+			</section>
+
+			<section id="physics">
+				<div class="kicker">Physics &amp; layout</div>
+				<h2>Speed, gravity, spread</h2>
+				<p class="lede">All physics is computed against real elapsed time, then scaled by a fixed 60fps
+					reference — so <code>speed</code> and <code>gravity</code> mean the same thing whether the display
+					runs at 60Hz or 144Hz, and whether or not you've capped <a href="#fps"><code>fps</code></a>.</p>
+
+				<p><strong>speed</strong> is a base magnitude in px/frame at the reference rate — each particle gets a
+					random 50–100% of it, for natural variation. <strong>angle</strong> sets the direction in degrees;
+					<strong>spread</strong> widens that into a cone, centered on <code>angle</code>, rather than acting
+					like a radius or a second speed control. <strong>gravity</strong> is a constant downward
+					acceleration applied every frame, also reference-rate scaled.</p>
+			</section>
+
+			<section id="root-origin">
+				<div class="kicker">Physics &amp; layout</div>
+				<h2>Root &amp; origin</h2>
+				<p class="lede">By default Dust operates against the window: the canvas fills the viewport, and
+					<code>origin</code> defaults to the window's center.</p>
+
+				<p>Pass <code>root</code> to scope everything to one element instead — the canvas sizes to that element
+					(tracked live via <code>ResizeObserver</code>), and default <code>origin</code> becomes that
+					element's own center, in its local coordinate space.</p>
+
+				<pre><code><span class="tok-kw">const</span> dust = <span class="tok-kw">new</span> <span class="tok-fn">Dust</span>({
+  root: document.<span class="tok-fn">querySelector</span>(<span class="tok-str">"#hero"</span>)!,
+  renderer: <span class="tok-kw">new</span> <span class="tok-fn">SnowRenderer</span>(),
+});</code></pre>
+
+				<p>Resizes — of the window, or of a custom <code>root</code> — repaint immediately instead of leaving a
+					blank canvas visible until the next animation frame.</p>
+			</section>
+
+			<section id="fps">
+				<div class="kicker">Physics &amp; layout</div>
+				<h2>fps</h2>
+				<p class="lede">An engine-level cap on how often the simulation/render loop actually does work —
+					independent of particle speed.</p>
+
+				<pre><code><span class="tok-kw">new</span> <span class="tok-fn">Dust</span>({ renderer, fps: <span class="tok-num">24</span> });</code></pre>
+
+				<p>The loop still ticks at the display's native refresh rate, but the expensive part — updating physics
+					and redrawing every particle — only runs at the capped rate; skipped ticks do a negligible timestamp
+					check and return. Motion covers the same real-world distance in the same real-world time either way,
+					just with fewer intermediate frames — leave it unset to run uncapped.</p>
+			</section>
+
+			<section id="effects">
+				<div class="kicker">Effects</div>
+				<h2>Built-in effects</h2>
+				<p class="lede">Five renderers, importable from the <code>/effects</code> subpath, all built on the
+					exact same <code>Renderer</code> interface documented above.</p>
+
+				<pre><code><span class="tok-kw">import</span> {
+  ConfettiRenderer,
+  SnowRenderer,
+  HeartRenderer,
+  TextRenderer,
+  ImageRenderer,
+} <span class="tok-kw">from</span> <span class="tok-str">"@gottheflag/dust/effects"</span>;</code></pre>
+
+				<div class="effect-grid">
+					<div class="effect-card">
+						<div class="swatch swatch-confetti"></div>
+						<h4>ConfettiRenderer</h4>
+						<p>Rotating rectangles in a random color palette.</p>
+					</div>
+					<div class="effect-card">
+						<div class="swatch swatch-snow"></div>
+						<h4>SnowRenderer</h4>
+						<p>Soft circles that sway side to side as they fall.</p>
+					</div>
+					<div class="effect-card">
+						<div class="swatch swatch-heart"></div>
+						<h4>HeartRenderer</h4>
+						<p>Rotating heart shapes, random colors.</p>
+					</div>
+					<div class="effect-card">
+						<div class="swatch swatch-text"></div>
+						<h4>TextRenderer</h4>
+						<p>Any strings you supply — plain text or emoji.</p>
+					</div>
+					<div class="effect-card">
+						<div class="swatch swatch-image"></div>
+						<h4>ImageRenderer</h4>
+						<p>Your own images, aspect ratio preserved.</p>
+					</div>
+				</div>
+
+				<div class="callout">
+					<span class="callout-title">Fade-out</span>
+					<p>Every built-in fades over its last ~250ms of life instead of popping out of existence, via a
+						shared <code>fadeAlpha()</code> helper — reuse it in your own renderers.</p>
+				</div>
+			</section>
+
+			<section id="confetti">
+				<h3>ConfettiRenderer <span class="tag">effect</span></h3>
+				<pre><code><span class="tok-kw">new</span> <span class="tok-fn">ConfettiRenderer</span>(colors?: string[])</code></pre>
+				<p>Takes an optional color palette; defaults to a six-color set. Each particle gets a random color,
+					size, and rotation speed.</p>
+			</section>
+
+			<section id="snow">
+				<h3>SnowRenderer <span class="tag">effect</span></h3>
+				<pre><code><span class="tok-kw">new</span> <span class="tok-fn">SnowRenderer</span>()</code></pre>
+				<p>No options — radius, opacity, and a sway phase/speed/amplitude are randomized per particle. The sway
+					is drawn purely at render time; it doesn't touch the underlying physics.</p>
+				<pre><code>dust.<span class="tok-fn">launch</span>({ angle: <span class="tok-num">90</span>, spread: <span class="tok-num">30</span>, speed: <span class="tok-num">1</span>, gravity: <span class="tok-num">0.02</span>, duration: <span class="tok-num">6000</span> });</code></pre>
+			</section>
+
+			<section id="heart">
+				<h3>HeartRenderer <span class="tag">effect</span></h3>
+				<pre><code><span class="tok-kw">new</span> <span class="tok-fn">HeartRenderer</span>(colors?: string[])</code></pre>
+				<p>Same shape as Confetti — optional palette, random size and rotation — drawn as a bezier heart path
+					instead of a rectangle.</p>
+			</section>
+
+			<section id="text">
+				<h3>TextRenderer <span class="tag">effect</span></h3>
+				<pre><code><span class="tok-kw">new</span> <span class="tok-fn">TextRenderer</span>(options?: {
+  texts?: string[];   <span class="tok-com">// plain text or emoji</span>
+  colors?: string[];
+  font?: string;
+  minSize?: number;
+  maxSize?: number;
+})</code></pre>
+				<p>Covers both text and emoji effects with one renderer — <code>fillText</code> renders emoji glyphs
+					natively. Each distinct (text, color, size) combination is rasterized once to an offscreen canvas
+					and reused via <code>drawImage</code>, since color emoji glyphs are expensive to redraw from scratch
+					every particle, every frame.</p>
+				<pre><code><span class="tok-kw">new</span> <span class="tok-fn">TextRenderer</span>({ texts: [<span class="tok-str">"🎉"</span>, <span class="tok-str">"+1"</span>, <span class="tok-str">"GG"</span>], colors: [<span class="tok-str">"#FFD166"</span>, <span class="tok-str">"#06D6A0"</span>] });</code></pre>
+			</section>
+
+			<section id="image">
+				<h3>ImageRenderer <span class="tag">effect</span></h3>
+				<pre><code><span class="tok-kw">new</span> <span class="tok-fn">ImageRenderer</span>(options: {
+  images: (<span class="tok-kw">string</span> | HTMLImageElement)[];
+  minSize?: number;
+  maxSize?: number;
+})</code></pre>
+				<p>Accepts URLs or already-constructed <code>HTMLImageElement</code>s. Images load asynchronously, so a
+					particle simply skips its draw for any frame where its image isn't decoded yet — no errors, no
+					placeholder flash.</p>
+			</section>
+
+			<section id="custom-renderers">
+				<div class="kicker">Guides</div>
+				<h2>Building a custom renderer</h2>
+				<p class="lede">Any object satisfying <code>Renderer&lt;T&gt;</code> works with
+					<code>new Dust({ renderer })</code> — it doesn't need to live inside this package.</p>
+
+				<pre><code><span class="tok-kw">import</span> { Particle, Renderer } <span class="tok-kw">from</span> <span class="tok-str">"@gottheflag/dust"</span>;
+
+<span class="tok-kw">interface</span> SparkleData {
+  radius: <span class="tok-kw">number</span>;
+}
+
+<span class="tok-kw">export class</span> SparkleRenderer <span class="tok-kw">implements</span> Renderer&lt;SparkleData&gt; {
+  <span class="tok-fn">init</span>(particle: Particle&lt;SparkleData&gt;): <span class="tok-kw">void</span> {
+    particle.data.radius = <span class="tok-num">2</span> + Math.<span class="tok-fn">random</span>() * <span class="tok-num">3</span>;
+  }
+
+  <span class="tok-fn">render</span>(ctx: CanvasRenderingContext2D, particle: Particle&lt;SparkleData&gt;): <span class="tok-kw">void</span> {
+    ctx.<span class="tok-fn">save</span>();
+    ctx.globalAlpha = <span class="tok-fn">fadeAlpha</span>(particle.life);
+    ctx.fillStyle = <span class="tok-str">"#fff"</span>;
+    ctx.<span class="tok-fn">beginPath</span>();
+    ctx.<span class="tok-fn">arc</span>(particle.x, particle.y, particle.data.radius, <span class="tok-num">0</span>, Math.PI * <span class="tok-num">2</span>);
+    ctx.<span class="tok-fn">fill</span>();
+    ctx.<span class="tok-fn">restore</span>();
+  }
+}</code></pre>
+
+				<h3>Patterns worth copying from the built-ins</h3>
+				<p><strong>Random pick per particle</strong> — Confetti, Heart, and Text all take a <code>colors</code>
+					(or <code>texts</code>) array and pick randomly in <code>init</code>. Cheap, and gives visual
+					variety for free.</p>
+				<p><strong>Options object once there's more than a color list</strong> — Text and Image take a
+					constructor options object rather than positional arguments, once there's more than one or two
+					knobs.</p>
+				<p><strong>Cache expensive draws</strong> — Text rasterizes to an offscreen canvas once per distinct
+					look and blits it afterward. Do this for anything expensive to draw repeatedly: complex paths,
+					gradients, color emoji.</p>
+				<p><strong>Async-safe drawing</strong> — Image checks <code>image.complete</code> before drawing, since
+					images load asynchronously. If something your renderer needs isn't ready, skip that frame's draw
+					rather than throwing.</p>
+			</section>
+
+			<section id="pooling">
+				<div class="kicker">Guides</div>
+				<h2>Particle data &amp; pooling</h2>
+				<p class="lede">Dust pools dead particles instead of reallocating on every burst.</p>
+				<p>Every particle field is explicitly overwritten in <code>launch()</code> before use — including
+					<code>data</code>, which is cleared in place (not reallocated) between reuses, so a renderer never
+					sees stale fields left over from a previous effect or a previous burst. You don't need to write any
+					reset logic yourself; it happens automatically before <code>init</code> runs.</p>
+			</section>
+
+			<section id="types">
+				<div class="kicker">Reference</div>
+				<h2>Exported types</h2>
+
+				<table>
+					<thead>
+						<tr>
+							<th>Export</th>
+							<th>From</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>Dust</code></td>
+							<td><code>@gottheflag/dust</code></td>
+							<td>Class. The engine.</td>
+						</tr>
+						<tr>
+							<td><code>Renderer&lt;T&gt;</code></td>
+							<td><code>@gottheflag/dust</code></td>
+							<td>Type. Visual contract for particles.</td>
+						</tr>
+						<tr>
+							<td><code>Particle&lt;T&gt;</code></td>
+							<td><code>@gottheflag/dust</code></td>
+							<td>Type. Simulation state for one particle.</td>
+						</tr>
+						<tr>
+							<td><code>Position</code></td>
+							<td><code>@gottheflag/dust</code></td>
+							<td>Type. <code>{ x: number; y: number }</code>.</td>
+						</tr>
+						<tr>
+							<td><code>LaunchOptions</code></td>
+							<td><code>@gottheflag/dust</code></td>
+							<td>Type. Options accepted by <code>launch()</code>.</td>
+						</tr>
+						<tr>
+							<td><code>ConfettiRenderer</code> / <code>ConfettiData</code></td>
+							<td><code>@gottheflag/dust/effects</code></td>
+							<td>Class + data type.</td>
+						</tr>
+						<tr>
+							<td><code>SnowRenderer</code> / <code>SnowData</code></td>
+							<td><code>@gottheflag/dust/effects</code></td>
+							<td>Class + data type.</td>
+						</tr>
+						<tr>
+							<td><code>HeartRenderer</code> / <code>HeartData</code></td>
+							<td><code>@gottheflag/dust/effects</code></td>
+							<td>Class + data type.</td>
+						</tr>
+						<tr>
+							<td><code>TextRenderer</code> / <code>TextData</code> / <code>TextRendererOptions</code>
+							</td>
+							<td><code>@gottheflag/dust/effects</code></td>
+							<td>Class + data + options types.</td>
+						</tr>
+						<tr>
+							<td><code>ImageRenderer</code> / <code>ImageData</code> / <code>ImageRendererOptions</code>
+							</td>
+							<td><code>@gottheflag/dust/effects</code></td>
+							<td>Class + data + options types.</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+
+			<footer>
+				<span>Copyright © <a href="https://github.com/gottheflag" target="_blank" rel="noopener">GTF</a></span>
+				<span>
+					<a href="https://github.com/gottheflag/dust" target="_blank" rel="noopener">GitHub</a>
+					·
+					<a href="https://github.com/gottheflag/dust/blob/main/LICENSE" target="_blank"
+						rel="noopener">Apache-2.0</a>
+				</span>
+			</footer>
+		</main>
+	</div>
+
+	<script src="script.js"></script>
+</body>
+
+</html>

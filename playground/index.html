@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Dust Playground</title>
+
+	<link rel="stylesheet" href="./style.css">
+	<style>
+		#root {
+			position: absolute;
+			inset: 0;
+		}
+
+		#toolbar {
+			position: fixed;
+			bottom: 1rem;
+			width: calc(100vw - 2rem);
+			margin-inline-start: 1rem;
+			padding: 0.5rem;
+		}
+
+		#launch-label {
+			pointer-events: none;
+			user-select: none;
+			inset: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1rem;
+		}
+
+		#effect-picker {
+			display: flex;
+			gap: 0.4rem;
+			flex-wrap: wrap;
+			margin-bottom: 0.75rem;
+		}
+
+		#effect-picker button {
+			font: inherit;
+			font-size: 0.85rem;
+			padding: 0.35rem 0.75rem;
+			border-radius: var(--ui-radius);
+			border: 1px solid var(--ui-border);
+			background: var(--ui-surface);
+			color: var(--ui-fg);
+			cursor: pointer;
+		}
+
+		#effect-picker button.active {
+			border-color: #7b61ff;
+			color: #7b61ff;
+		}
+
+		#stats {
+			position: fixed;
+			top: 1rem;
+			right: 1rem;
+			font-size: 0.8rem;
+			background: var(--ui-surface);
+			border: 1px solid var(--ui-border);
+			border-radius: var(--ui-radius);
+			padding: 0.5rem 0.75rem;
+			pointer-events: none;
+			user-select: none;
+			min-width: 9rem;
+		}
+
+		#stats div {
+			display: flex;
+			justify-content: space-between;
+			gap: 1rem;
+		}
+
+		#stats span:last-child {
+			font-variant-numeric: tabular-nums;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div id="root">
+		<span id="launch-label">Click to launch</span>
+	</div>
+
+	<div id="stats">
+		<div><span>particles</span><span id="stat-particles">0</span></div>
+		<div><span>fps</span><span id="stat-fps">–</span></div>
+	</div>
+
+	<article id="toolbar">
+		<div id="effect-picker">
+			<button type="button" data-effect="confetti" class="active">Confetti</button>
+			<button type="button" data-effect="snow">Snow</button>
+			<button type="button" data-effect="heart">Heart</button>
+			<button type="button" data-effect="text">Text</button>
+			<button type="button" data-effect="image">Image</button>
+		</div>
+		<h2>Options</h2>
+		<label>
+			Spread:
+			<input id="spread" type="number" min="0" max="360" value="360">
+		</label>
+		<label>
+			Speed:
+			<input id="speed" type="number" min="0" max="100" value="16">
+		</label>
+		<label>
+			Angle:
+			<input id="angle" type="number" min="0" max="360" value="0">
+		</label>
+		<label>
+			Gravity:
+			<input id="gravity" type="number" min="0" max="1" step="0.01" value="0.3">
+		</label>
+		<label>
+			Count:
+			<input id="count" type="number" min="0" max="1000" value="100">
+		</label>
+		<label>
+			Duration:
+			<input id="duration" type="number" min="0" max="10000" value="1500">
+		</label>
+	</article>
+	<script type="module" src="./index.ts"></script>
+</body>
+
+</html>
