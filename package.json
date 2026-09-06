@@ -29,7 +29,9 @@
 		"typecheck": "tsc --noEmit",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"playground": "vite --config ./playground/vite.config.ts"
+		"playground": "vite --config ./playground/vite.config.ts",
+		"prepack": "pnpm run build",
+		"prepublishOnly": "pnpm run typecheck && pnpm run test"
 	},
 	"keywords": [
 		"dust",
